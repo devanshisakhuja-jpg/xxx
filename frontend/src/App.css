@@ -182,3 +182,138 @@
     border-right-color: var(--border);
   }
 }
+.loginpage {
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background-image: url("/download.jpg"); /* adjust path: see note below */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/*
+  Path note:
+  - If download.jpg lives in your `public` folder, use "/download.jpg" (as above).
+  - If it lives alongside your component/assets, import it in the JSX instead:
+      import loginBg from "../assets/download.jpg";
+    then set the style inline: style={{ backgroundImage: `url(${loginBg})` }}
+    A bundler (Vite/CRA) needs to know about the file via import or the public folder —
+    a plain relative path in CSS often breaks after the build step.
+*/
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 360px;
+  margin: 60px auto;
+  padding: 24px 28px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container form {
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.login-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkbox-container a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.checkbox-container a:hover {
+  text-decoration: underline;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.login-container button:hover {
+  background-color: #1d4ed8;
+}
+
+.login-container h5 {
+  margin-top: 14px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.login-container h5 a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.divider,
+.divider1 {
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.divider1 {
+  margin-bottom: 12px;
+}
+
+.divider {
+  margin-top: 16px;
+}
