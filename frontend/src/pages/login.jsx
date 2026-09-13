@@ -1,75 +1,123 @@
-import {useState ,useEffect} from "react";
-import {Link,useNavigate} from "react-router-dom";
+import React, { useState } from "react";
+import "../App.css";
 
+function Login() {
+  const [showPassword, setShowPassword] = useState(false);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Login submitted");
+  };
 
-export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
-   const navigate = useNavigate();
-   
+  return (
+    <div className="login-page">
+
+      {/* Background Effects */}
+      <div className="red-glow glow-one"></div>
+      <div className="red-glow glow-two"></div>
+
+      <div className="web web-1"></div>
+      <div className="web web-2"></div>
+      <div className="web web-3"></div>
+
+      {/* Main Container */}
+      <div className="login-container">
+
       
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("rememberedUsername");
-    if (savedUsername) {
-      setUsername(savedUsername);
-      setRememberMe(true);
-    }
-   }, []);
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    setError("");
-    if (username === "user" && password === "password") {
-      if (rememberMe) {
-        localStorage.setItem("rememberedUsername", username);
-      } else {
-        localStorage.removeItem("rememberedUsername");
-      }
-      navigate("/"); 
-    } else {
-      setError("Invalid username or password");
-    }
-}
-  
-return (
-    <div className = "loginpage">
-    <>
-    
-    <div className="login-container">
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}> 
-            <div className="divider1">
-            <h4>Welcome back! Please enter your credentials to log in.</h4>
-            </div>   
-            <div className="form-group">
-            <label htmlFor="username">Username:</label>
-            <input type="text" placeholder="Enter your username" id="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-        
-           <label htmlFor="password">Password:</label>
-            <input type="password" placeholder="Enter your password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </div>
-            <div className="checkbox-container">
-            <div className="remember-me">
-            <input type="checkbox" id="rememberMe" />
-            
-            <label htmlFor="rememberMe">Remember me</label>
-            </div>
-       
-            <Link to="/forgot-password">Forgot password?</Link>
-            </div>
-            <button type="submit">Login</button>
-           <h5>Don't have an account? <Link to="/signup">SignUp</Link></h5>
-          <div className="divider">
-          <h6>Create an account to save titles, rate shows, and build your profile.</h6>
+        {/* RIGHT SIDE */}
+        <div className="login-card">
+
+          <div className="card-top">
+            <span className="card-label">MISSION CONTROL</span>
+            <span className="status-dot"></span>
           </div>
+
+          <h2>LOGIN</h2>
+
+          <p className="login-subtitle">
+            Enter your details to continue your journey.
+          </p>
+
+          <form onSubmit={handleSubmit}>
+
+            {/* EMAIL */}
+            <div className="input-group">
+              <label>EMAIL</label>
+
+              <input
+                type="email"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            {/* PASSWORD */}
+            <div className="input-group">
+              <label>PASSWORD</label>
+
+              <div className="password-box">
+
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  required
+                />
+
+                <button
+                  type="button"
+                  className="show-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "HIDE" : "SHOW"}
+                </button>
+
+              </div>
+            </div>
+
+            {/* OPTIONS */}
+            <div className="login-options">
+
+              <label className="remember">
+                <input type="checkbox" />
+                <span>Remember me</span>
+              </label>
+
+              <a href="#">
+                Forgot Password?
+              </a>
+
+            </div>
+
+            {/* LOGIN BUTTON */}
+            <button
+              type="submit"
+              className="login-btn"
+            >
+              <span>LOGIN</span>
+              <span className="arrow">→</span>
+            </button>
+
           </form>
-         </div>
-         
-         </>
-         </div>
-          );
- 
+
+          {/* DIVIDER */}
+          <div className="divider">
+            <span></span>
+            <p>OR</p>
+            <span></span>
+          </div>
+
+          {/* SIGN UP */}
+          <p className="signup-text">
+            New to the mission?
+            <a href="#"> CREATE ACCOUNT</a>
+          </p>
+
+        </div>
+
+      </div>
+    </div>
+  );
 }
+
+export default Login;

@@ -1,14 +1,12 @@
 import React, { useState, useMemo } from "react";
 
 /*
-  SPIDERMAN TO-DO LIST — "Upcoming Events" page
-  --------------------------------------------
-  - Arial font throughout (as requested)
-  - XP bar that fills as you complete tasks
-  - Streak counter that breaks if you skip a day, revivable by spending XP
-  - Add Task opens a modal (title, description, deadline) — XP is fixed at 20 per task
-  - Mark Done / Delete on each task card
-  - No background image — plain dark theme with a subtle web-line texture
+  SPIDERMAN TO-DO LIST — Full Screen Fit & White Theme
+  ----------------------------------------------------
+  - Full screen background image (No black extra space)
+  - White containers & cards
+  - Red Buttons throughout
+  - Arial font
 */
 
 const FIXED_TASK_XP = 20;
@@ -18,29 +16,32 @@ const REVIVE_COST = 50;
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 const styles = `
+  /* Global Resets to Remove Black Gaps */
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+  }
+
   .sm-app {
-    background-image: url("download.jpg")
     font-family: Arial, Helvetica, sans-serif;
     min-height: 100vh;
-    color: #eef1f7;
+    width: 100vw;
+    color: #111111;
     position: relative;
+    box-sizing: border-box;
+    
+    /* Background Image Setup */
+    background-image: url("download.jpg");
+   
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
-  .sm-app::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(6,8,15,0.88) 0%, rgba(10,14,26,0.92) 55%, rgba(6,8,15,0.96) 100%);
-    pointer-events: none;
-  }
-  .sm-web-lines {
-    position: fixed;
-    inset: 0;
-    opacity: 0.07;
-    pointer-events: none;
-    background-image:
-      repeating-linear-gradient(45deg, #ffffff 0, #ffffff 1px, transparent 1px, transparent 90px),
-      repeating-linear-gradient(-45deg, #ffffff 0, #ffffff 1px, transparent 1px, transparent 90px);
-  }
+
   .sm-shell {
     position: relative;
     z-index: 1;
@@ -48,168 +49,211 @@ const styles = `
     margin: 0 auto;
     padding: 28px 20px 120px;
   }
+
+  /* White Topbar Container */
   .sm-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    background: rgba(17, 22, 38, 0.72);
-    border: 1px solid rgba(200, 16, 46, 0.35);
+    background: #ffffff;
+    border: 2px solid #c8102e;
     border-radius: 14px;
     padding: 14px 18px;
-    backdrop-filter: blur(6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   }
+
   .sm-streak {
     display: flex;
     align-items: center;
     gap: 8px;
     font-weight: bold;
     font-size: 15px;
-    color: #ffd166;
+    color: #c8102e;
   }
-  .sm-streak-broken { color: #ff6b6b; }
+
+  .sm-streak-broken { color: #d90429; }
+
+  /* Red Buttons */
   .sm-revive-btn {
     font-family: Arial, sans-serif;
     background: #c8102e;
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 6px 10px;
+    padding: 6px 12px;
     font-size: 12px;
     font-weight: bold;
     cursor: pointer;
     margin-left: 8px;
   }
   .sm-revive-btn:disabled {
-    background: #4a2530;
-    color: #a9a3a3;
+    background: #e0a3ad;
     cursor: not-allowed;
   }
+
   .sm-xp-block { flex: 1; max-width: 320px; }
   .sm-xp-label {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    color: #b9c0d4;
+    color: #444444;
+    font-weight: bold;
     margin-bottom: 4px;
   }
+  
   .sm-xp-track {
     height: 10px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.08);
+    background: #e0e0e0;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid #ccc;
   }
+
   .sm-xp-fill {
     height: 100%;
-    background: linear-gradient(90deg, #1b2a63, #3457d5, #ffd166);
+    background: #c8102e;
     transition: width 0.4s ease;
   }
+
   .sm-heading-row {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     margin: 30px 0 16px;
   }
+
   .sm-heading {
     font-size: 26px;
     font-weight: bold;
-    color: #f5f5f5;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
     margin: 0;
     letter-spacing: 0.2px;
   }
-  .sm-heading span { color: #c8102e; }
+  .sm-heading span { color: #ff4d4d; }
+
   .sm-count-pill {
     font-size: 12px;
-    color: #b9c0d4;
-    background: rgba(255,255,255,0.06);
+    font-weight: bold;
+    color: #c8102e;
+    background: #ffffff;
     border-radius: 999px;
-    padding: 4px 10px;
+    padding: 4px 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
+
   .sm-task-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
+
+  /* White Task Cards */
   .sm-task-card {
-    background: rgba(15, 19, 33, 0.82);
-    border-left: 4px solid #c8102e;
+    background: #ffffff;
+    border-left: 5px solid #c8102e;
     border-radius: 10px;
-    padding: 14px 16px;
+    padding: 16px;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    transition: transform 0.15s ease, border-color 0.15s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   }
+
   .sm-task-card.done {
-    border-left-color: #2fbf71;
-    opacity: 0.6;
+    border-left-color: #28a745;
+    opacity: 0.7;
   }
+
   .sm-task-card.upcoming-soon {
-    border-left-color: #ffd166;
-    box-shadow: 0 0 0 1px rgba(255, 209, 102, 0.25);
+    border-left-color: #ff9800;
   }
+
   .sm-task-main { flex: 1; min-width: 0; }
+  
   .sm-task-title {
     font-size: 16px;
     font-weight: bold;
+    color: #111111;
     margin: 0 0 4px;
     word-break: break-word;
   }
-  .sm-task-title.done-text { text-decoration: line-through; color: #8f97ab; }
+  
+  .sm-task-title.done-text { text-decoration: line-through; color: #777777; }
+  
   .sm-task-desc {
     font-size: 13px;
-    color: #c3c9db;
+    color: #555555;
     margin: 0 0 8px;
     word-break: break-word;
   }
+
   .sm-task-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     font-size: 11px;
   }
+
   .sm-chip {
-    background: rgba(255,255,255,0.08);
-    padding: 3px 8px;
+    background: #f0f0f0;
+    padding: 4px 8px;
     border-radius: 999px;
-    color: #d7dcec;
+    color: #333333;
+    font-weight: bold;
   }
-  .sm-chip.xp-chip { background: rgba(255, 209, 102, 0.18); color: #ffd166; }
-  .sm-chip.soon-chip { background: rgba(255, 107, 107, 0.18); color: #ff8a8a; }
+
+  .sm-chip.xp-chip { background: #ffe6e6; color: #c8102e; }
+  .sm-chip.soon-chip { background: #fff3cd; color: #856404; }
+
   .sm-task-actions {
     display: flex;
     flex-direction: column;
     gap: 6px;
     align-items: flex-end;
   }
+
+  /* All Red Action Buttons */
   .sm-btn-done, .sm-btn-delete {
     font-family: Arial, sans-serif;
     border: none;
     border-radius: 8px;
-    padding: 6px 10px;
+    padding: 8px 12px;
     font-size: 12px;
+    font-weight: bold;
     cursor: pointer;
     white-space: nowrap;
   }
+
   .sm-btn-done {
-    background: #1b2a63;
-    color: #eef1f7;
-    font-weight: bold;
+    background: #c8102e;
+    color: #ffffff;
   }
-  .sm-btn-done:disabled { background: #22301f; color: #7fbf7f; cursor: default; }
+  
+  .sm-btn-done:disabled { 
+    background: #e2e2e2; 
+    color: #888888; 
+    cursor: default; 
+  }
+
   .sm-btn-delete {
-    background: transparent;
-    color: #ff8a8a;
-    border: 1px solid rgba(255,138,138,0.4);
+    background: #ffffff;
+    color: #c8102e;
+    border: 1px solid #c8102e;
   }
+
   .sm-empty {
     text-align: center;
     padding: 40px 20px;
-    color: #8f97ab;
+    background: #ffffff;
+    border-radius: 12px;
+    color: #666666;
     font-size: 14px;
   }
+
+  /* Floating Red Button */
   .sm-fab {
     position: fixed;
     right: 24px;
@@ -217,103 +261,122 @@ const styles = `
     width: 58px;
     height: 58px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #e2274a, #8a0f26);
-    border: 2px solid rgba(255,255,255,0.25);
+    background: #c8102e;
+    border: 2px solid #ffffff;
     color: white;
     font-size: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(200,16,46,0.45);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
     z-index: 5;
   }
+
   .sm-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(4,6,12,0.72);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10;
     padding: 16px;
   }
+
+  /* White Modal Box */
   .sm-modal {
     font-family: Arial, sans-serif;
-    background: #111627;
-    border: 1px solid rgba(200,16,46,0.4);
+    background: #ffffff;
+    border: 2px solid ;
     border-radius: 14px;
     padding: 22px;
     width: 100%;
     max-width: 400px;
+    color: #111111;
   }
+
   .sm-modal h3 {
     margin: 0 0 16px;
     font-size: 18px;
+    color: #c8102e;
   }
+
   .sm-field { margin-bottom: 12px; }
   .sm-field label {
     display: block;
     font-size: 12px;
-    color: #b9c0d4;
+    color: #333333;
+    font-weight: bold;
     margin-bottom: 4px;
   }
+
   .sm-field input, .sm-field textarea {
     width: 100%;
     box-sizing: border-box;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: #f9f9f9;
+    border: 1px solid #ccc;
     border-radius: 8px;
     padding: 8px 10px;
-    color: #eef1f7;
+    color: #111111;
     font-family: Arial, sans-serif;
-    font-size: 13px;
+    font-size: 16px;
   }
+
   .sm-field textarea { resize: vertical; min-height: 54px; }
+
   .sm-modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
     margin-top: 16px;
   }
+
   .sm-btn-cancel, .sm-btn-add {
     font-family: Arial, sans-serif;
-    border: none;
     border-radius: 8px;
     padding: 8px 14px;
     font-size: 13px;
     cursor: pointer;
     font-weight: bold;
   }
-  .sm-btn-cancel { background: transparent; color: #b9c0d4; border: 1px solid rgba(255,255,255,0.2); }
-  .sm-btn-add { background: #c8102e; color: white; }
+
+  .sm-btn-cancel { 
+    background: #ffffff; 
+    color: #333333; 
+    border: 1px solid #ccc; 
+  }
+
+  .sm-btn-add { 
+    background: #c8102e; 
+    color: white; 
+    border: none;
+  }
+
   .sm-toast {
     position: fixed;
     top: 18px;
     left: 50%;
     transform: translateX(-50%);
-    background: #1b2a63;
-    border: 1px solid #3457d5;
-    color: #ffd166;
-    padding: 8px 16px;
+    background: #c8102e;
+    color: #ffffff;
+    padding: 8px 18px;
     border-radius: 999px;
     font-size: 13px;
     font-weight: bold;
     z-index: 20;
-    animation: sm-toast-in 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
-  @keyframes sm-toast-in {
-    from { opacity: 0; transform: translate(-50%, -8px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
-  }
+
   .sm-simday {
     font-family: Arial, sans-serif;
-    background: transparent;
-    border: 1px dashed rgba(255,255,255,0.25);
-    color: #8f97ab;
+    background: #c8102e;
+    color: #ffffff;
+    border: none;
     font-size: 11px;
-    border-radius: 8px;
-    padding: 5px 9px;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 6px 10px;
     cursor: pointer;
     margin-top: 10px;
   }
@@ -322,7 +385,7 @@ const styles = `
 function isDueSoon(deadline) {
   if (!deadline) return false;
   const diffMs = new Date(deadline).getTime() - Date.now();
-  return diffMs > 0 && diffMs < 1000 * 60 * 60 * 24; // within 24h
+  return diffMs > 0 && diffMs < 1000 * 60 * 60 * 24;
 }
 
 export default function SpidermanTodo() {
@@ -367,7 +430,7 @@ export default function SpidermanTodo() {
       },
     ]);
     setShowModal(false);
-    showToast("Task added to your web!");
+    showToast("Task added!");
   }
 
   function handleMarkDone(task) {
@@ -376,7 +439,7 @@ export default function SpidermanTodo() {
     setXp((prev) => prev + task.xp);
     setCompletedToday(true);
     if (streakBroken) setStreakBroken(false);
-    showToast(`+${task.xp} XP swung in! 🕸️`);
+    showToast(`+${task.xp} XP earned! 🕸️`);
   }
 
   function handleDelete(id) {
@@ -390,8 +453,6 @@ export default function SpidermanTodo() {
     showToast("Streak revived using XP!");
   }
 
-  // Demo-only: simulates a day passing so you can see streak logic work.
-  // In a real app this check would run server-side against real dates.
   function handleSimulateNewDay() {
     if (completedToday) {
       setStreak((prev) => prev + 1);
@@ -408,7 +469,6 @@ export default function SpidermanTodo() {
   return (
     <div className="sm-app">
       <style>{styles}</style>
-      <div className="sm-web-lines" />
       <div className="sm-shell">
         <div className="sm-topbar">
           <div>
@@ -441,7 +501,7 @@ export default function SpidermanTodo() {
         </div>
 
         {ordered.length === 0 ? (
-          <div className="sm-empty">No tasks yet — hit the web button to add your first one.</div>
+          <div className="sm-empty">No tasks yet — hit the button to add your first one.</div>
         ) : (
           <div className="sm-task-list">
             {ordered.map((task) => {
@@ -502,7 +562,7 @@ export default function SpidermanTodo() {
                   onChange={(e) => setForm({ ...form, deadline: e.target.value })}
                 />
               </div>
-              <p style={{ fontSize: "12px", color: "#8f97ab", margin: "0 0 12px" }}>
+              <p style={{ fontSize: "12px", color: "#666666", margin: "0 0 12px" }}>
                 Every task is worth a fixed {FIXED_TASK_XP} XP.
               </p>
               <div className="sm-modal-actions">
