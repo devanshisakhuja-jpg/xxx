@@ -468,6 +468,7 @@ export default function SpidermanTodo() {
 
   return (
     <div className="sm-app">
+        <navbar />
       <style>{styles}</style>
       <div className="sm-shell">
         <div className="sm-topbar">
